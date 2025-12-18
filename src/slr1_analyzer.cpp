@@ -155,3 +155,213 @@ SLR1Analyzer::SLR1Analyzer(std::vector<std::string>& prods) {
         AddT(); // 添加终结符
         S = *nonterminal_.begin();
 }
+
+void SLR1Analyzer::Convert2Extend() {
+    auto newS = S;
+    newS += "'";
+    nonterminal_.insert(nonterminal_.begin(), newS);
+    prods_[newS].push_back(S);
+    S = newS;
+}
+
+void SLR1Analyzer::AddP(std::string left, std::string right) {
+    right += "#";
+    std::string pRight = "";
+    for (size_t i = 0; i < right.size(); i++) {
+        if (right[i] == '|' || right[i] == '#') {
+            prods_[left].push_back(pRight);
+            pRight = "";
+        } else {
+            pRight += right[i];
+        }
+    }
+}
+
+void SLR1Analyzer::AddPwithNum() {
+    int i = 0;
+    for (std::string left : nonterminal_) {
+        for (std::string right : prods_[left]) {
+            prod2num_[left + "->" + right] = i;
+            i++;
+        }
+    }
+}
+
+void SLR1Analyzer::AddT() {
+    std::string tmp = "";
+    for (std::string left : nonterminal_) {
+        for (std::string right : prods_[left]) {
+            right += "#";
+            for (size_t i = 0; i < right.size(); i++) {
+                if (right[i] == '|' || right[i] == ' ' || right[i] == '#') {
+                    // add it to terminal
+                    if ((find(nonterminal_.begin(), nonterminal_.end(), tmp) == nonterminal_.end()) && tmp != EMPTYCH) {
+                        terminal_.push_back(tmp);
+                    }
+                    tmp = "";
+                } else {
+                    tmp += right[i];
+                }
+            }
+        }
+    } 
+
+    sort(terminal_.begin(), terminal_.end());
+    terminal_.erase(unique(terminal_.begin(), terminal_.end()), terminal_.end());
+}
+
+void SLR1Analyzer::ComputeFirst() {
+    first_set_.clear();
+
+    first_set_[EMPTYCH].insert(EMPTYCH);
+    for (std::string X : terminal_)
+    {
+        first_set_[X].insert(X);
+    }
+
+    // for nonterminal
+    int j = 0;
+    while (j < 10) {
+        for (size_t i = 0; i < nonterminal_.size(); i++) {
+            std::string A = nonterminal_[i];
+
+            // iterate A prods
+            for (size_t k = 0; k < prods_[A].size(); k++) {
+                int Continue = 1;
+                std::string right = prods_[A][k];
+
+                std::string first_token;
+                if (right.find(" ") == std::string::npos)
+                    first_token = right;
+                else
+                    first_token = right.substr(0, right.find(" "));
+
+                if (!first_set_[first_token].empty()) {
+                    for (std::string firstX : first_set_[first_token]) {
+                        if (firstX == EMPTYCH) {
+                            continue;
+                        } else {
+                            first_set_[A].insert(firstX);
+                            Continue = 0;
+                        }
+                    }
+                    if (Continue) {
+                        first_set_[A].insert(EMPTYCH);
+                    }
+                }
+            }
+        }
+        j++;
+    }
+}
+
+void SLR1Analyzer::ComputeFollow() {
+    follow_set_[S].insert("#");
+
+    auto j = 0;
+    while (j < 10) {
+        // iterate nonterminal
+        for (std::string A : nonterminal_) {
+            for (std::string right : prods_[A]) {
+                for (std::string B : nonterminal_) {
+                    // A->Bb
+                    if (right.find(B) != std::string::npos) {
+                        // find b
+                        std::string b;
+                        int flag = 0;
+                        // found E'
+                        if (right[right.find(B) + B.size()] != ' ' && right[right.find(B) + B.size()] != '\0') {
+                            std::string s = right.substr(right.find(B));               // E'b
+                            std::string temp = right.substr(right.find(B) + B.size()); //' b
+
+                            // A->E'
+                            if (temp.find(" ") == std::string::npos) {
+                                B = s;                                                // B:E->E'
+                                follow_set_[B].insert(follow_set_[A].begin(), follow_set_[A].end()); 
+                                flag = 1;
+                            } else {
+                                // A->E'b
+                                B = s.substr(0, s.find(" "));
+                                temp = temp.substr(temp.find(" ") + 1); // b
+                                if (temp.find(" ") == std::string::npos) {
+                                    b = temp;
+                                } else {
+                                    b = temp.substr(0, temp.find(" "));
+                                }
+                            }
+                        } else if (right[right.find(B) + B.size()] == ' ') {  // A->aEb
+                        
+                            std::string temp = right.substr(right.find(B) + B.size() + 1);
+                            if (temp.find(" ") == std::string::npos) {
+                                b = temp;
+                            } else {
+                                b = temp.substr(0, temp.find(" "));
+                            }
+                        } else {  // A->aE
+                            follow_set_[B].insert(follow_set_[A].begin(), follow_set_[A].end());
+                            flag = 1;
+                        }
+
+                        // get follow_set_[B]
+                        if (flag == 0) {
+                            // first_set_[b] doesn't include E
+                            if (first_set_[b].find(EMPTYCH) == first_set_[b].end()) {
+                                follow_set_[B].insert(first_set_[b].begin(), first_set_[b].end());
+                            } else {
+                                for (std::string follow : first_set_[b]) {
+                                    if (follow == EMPTYCH) {
+                                        continue;
+                                    } else {
+                                        follow_set_[B].insert(follow);
+                                    }
+                                }
+                                follow_set_[B].insert(follow_set_[A].begin(), follow_set_[A].end());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        j++;
+    }
+}
+
+auto SLR1Analyzer::GetClosure(Item item) -> std::set<Item> {
+    std::set<Item> C; // closures
+    C.insert(item);
+
+    std::queue<Item> bfs;
+    bfs.push(item);
+
+    while (!bfs.empty()) {
+        Item now = bfs.front();
+        bfs.pop();
+
+        std::vector<std::string> buffer = Split(now.GetRight(), ".");
+
+        if (buffer.size() > 1) {
+            std::string first = FirstWord(buffer[1].erase(0, 1));
+
+            if (Isnonterminal(first)) {
+                for (auto it2 = prods_[first].begin(); it2 != prods_[first].end(); it2++) {
+                    Item temp(first, *it2);
+                    if (!InItemSet(temp, C)) {
+                        C.insert(temp);
+                        bfs.push(temp);
+                    }
+                }
+            }
+        }
+    }
+    return C;
+}
+
+void SLR1Analyzer::
+void SLR1Analyzer::
+void SLR1Analyzer::
+void SLR1Analyzer::
+void SLR1Analyzer::
+void SLR1Analyzer::
+void SLR1Analyzer::
+void SLR1Analyzer::
+void SLR1Analyzer::
