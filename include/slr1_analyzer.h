@@ -1,5 +1,5 @@
 #pragma once
-#include <memory>
+#include <algorithm>
 #include <string>
 #include <vector>
 #include <map>
@@ -10,16 +10,16 @@ class Item {
 public:
     Item(std::string i);
     Item(std::string l, std::string r);
-    auto GetLeft() const -> std::string&;
-    auto GetRight() const -> std::string&;
-    auto GetItem() const -> std::string&;
+    auto GetLeft() const -> const std::string&;
+    auto GetRight() const -> const std::string&;
+    auto GetItem() -> const std::string&;
     auto GetDot() const -> int;
     void AddDot(int pos);
 
     auto HasNextDot() const -> bool;
     auto GetNext() const -> std::string;
-    auto NextDot() const -> std::string;
-    auto operator==(const Item& other) -> bool;
+    auto NextDot() -> std::string;
+    auto operator==(Item& other) -> bool;
     int id;
 
 private:
