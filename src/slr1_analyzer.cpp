@@ -108,3 +108,50 @@ auto Item::NextDot() -> std::string {
 auto Item::operator==(Item& other) -> bool {
     return GetItem() == other.GetItem();
 }
+
+bool operator<(const State &x, const State &y) { return x.id < y.id; }
+
+bool operator<(const Item &x, const Item &y) { return x.id < y.id; }
+
+bool operator<(const DFA_edges &x, const DFA_edges &y) { return x.from < y.from; }
+
+bool operator==(const DFA_edges &x, const DFA_edges &y) { return x.from == y.from && x.path == y.path && x.to == y.to; }
+
+bool operator==(const std::set<Item> &x, const std::set<Item> &y) {
+    auto it1 = x.begin();
+    auto it2 = y.begin();
+
+    for (; it1 != x.end() && it2 != y.end(); it1++, it2++)  // mark
+    {
+        Item a = *it1;
+        Item b = *it2;
+        if (a == b)
+            continue;
+        else
+            return false;
+    }
+    return true;
+}
+
+SLR1Analyzer::SLR1Analyzer(std::vector<std::string>& prods) {
+        // 读取文法规则
+        std::string line;
+        for (size_t t = 0; t < prods.size(); t++)
+        {
+            size_t i;
+            line = prods[t];
+            // 读取左部
+            std::string left = "";
+            for (i = 0; line[i] != '-' && i < line.size(); i++)
+            {
+                left += line[i];
+            }
+
+            nonterminal_.push_back(left); // 左部加入非终结符号集
+            // 读取右部
+            std::string right = line.substr(i + 2, line.size() - i); // 获取产生式右部
+            AddP(left, right);                                  // 添加产生式
+        }
+        AddT(); // 添加终结符
+        S = *nonterminal_.begin();
+}
