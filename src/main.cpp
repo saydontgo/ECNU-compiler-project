@@ -103,13 +103,21 @@ void Analysis(std::string &prog) {
   LexicalAnalyzer lexer(prog);
   auto tokens = lexer.Tokenize();
   lexer.PrintErrors();
-  tokens->PrintAll();
-  LL1Parser parser(lexer.GetTable());
-  auto trees = parser.ParseTokens(tokens);
-  parser.PrintErrors();
+  // tokens->PrintAll();
+
+  // LL1 Parser
+  // LL1Parser parser(lexer.GetTable());
+  // auto trees = parser.ParseTokens(tokens);
+  // parser.PrintErrors();
   // trees->PrintOutput();
-  trees->Abstract();
-  trees->PrintOutput();
+  // trees->Abstract();
+  // trees->PrintOutput();
+
+  // SLR1 Parser
+  SLR1Parser parser(prods);
+  auto res = parser.ParsingTokens(tokens);
+  parser.PrintErrors();
+  parser.PrintOutput(res);
   /********* End *********/
 }
 
@@ -163,9 +171,9 @@ int main(int argc, char *argv[]) {
   }
   prog += '\n';
 
-  // Analysis(prog);
+  Analysis(prog);
   // test_ll1Analyzer();
 
-  TableTest();
+  // TableTest();
   return 0;
 }

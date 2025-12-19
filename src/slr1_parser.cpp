@@ -6,54 +6,71 @@ SLR1Parser::SLR1Parser(std::vector<std::string> &prods)
   ana_->CreateSLRTable(action_table_, goto_table_);
 }
 auto SLR1Parser::ParsingTokens(std::shared_ptr<const TokenStream> tokens)
-      -> std::stack<std::string> {
-    std::stack<std::string> Analysis;
-    std::stack<std::string> results;
+    -> std::stack<std::string> {
+  std::stack<std::string> Analysis;
+  std::stack<std::string> results;
 
-    // 0状态入栈
-    Analysis.push("#");
-    Analysis.push("0");
-    
-    int token_index = 0;
-    auto token = tokens->TokenAt(token_index);
+  // 0状态入栈
+  Analysis.push("#");
+  Analysis.push("0");
 
-    while (1) {
-      std::pair<int, std::string> title(stoi(Analysis.top()), token.lexeme_);
-      std::string res = action_table_[title];
-
-      // shift
-      if (res[0] == 's') {
-        int state = stoi(res.substr(1));
-        Analysis.push(token.lexeme_);
-        Analysis.push(std::to_string(state));
-        token_index++;
+  int token_index = 0;
+  auto token = tokens->TokenAt(token_index);
+  int flag = 0;
+  int report = 0;
+  while (1) {
+    std::pair<int, std::string> title(stoi(Analysis.top()), token.lexeme_);
+    std::string res = action_table_[title];
+    // std::cout << res << std::endl;
+    // shift
+    if (res[0] == 's') {
+      int state = stoi(res.substr(1));
+      Analysis.push(token.lexeme_);
+      Analysis.push(std::to_string(state));
+      if (token_index + 1 >= int(tokens->Size())) {
+        token = Token({-1, -1, "#", token.line_, -1});
+        continue;
       }
-      // reduce
-      else if (res[0] == 'r') {
-        int pos = stoi(res.substr(1));
-        std::string left;                     // 产生式左部
-        int b = 2 * ana_->RightNum(left, pos); // 2倍的产生式右部符号数量
-        results.push(ana_->GetResult(pos));
-        while (b > 0) {
-          Analysis.pop();
-          b--;
-        }
-
-        int s1 = stoi(Analysis.top());
-        Analysis.push(left);
-        std::pair<int, std::string> t(s1, left);
-        Analysis.push(std::to_string(goto_table_[t]));
-      } else if (res[0] == 'a') {
-        return results;
-      } else if (res.length() == 0 && token.lexeme_ != EMPTYCH) {
-        auto E = make_pair(token.id_, EMPTYCH);
-        // token = _tokens.insert(token, E);
-      } else {
-        reporter_->Report(ErrorLevel::Error, ErrorCode::MissingTerminatingCharacter, token.line_, token.col_, ";");
-        // token = _tokens.erase(token);
-        // token = _tokens.insert(token, make_pair(4, ";"));
-      }
+      token = tokens->TokenAt(++token_index);
     }
+    // reduce
+    else if (res[0] == 'r') {
+      int pos = stoi(res.substr(1));
+      std::string left;                      // 产生式左部
+      int b = 2 * ana_->RightNum(left, pos); // 2倍的产生式右部符号数量
+      results.push(ana_->GetResult(pos));
+      while (b > 0) {
+        Analysis.pop();
+        b--;
+      }
+
+      int s1 = stoi(Analysis.top());
+      Analysis.push(left);
+      std::pair<int, std::string> t(s1, left);
+      Analysis.push(std::to_string(goto_table_[t]));
+    } else if (res[0] == 'a') {
+      return results;
+    } else if (res.length() == 0 && token.lexeme_ != EMPTYCH) {
+      if (!flag) {
+        token_index--;
+      }
+      flag = 0;
+      token = Token({-1, -1, EMPTYCH, token.line_, -1});
+      // token = _tokens.insert(token, E);
+    } else {
+      if (!report)
+      reporter_->Report(ErrorLevel::Error,
+                        ErrorCode::MissingSymbol, 4,
+                        token.col_, ";");
+      flag = !flag;
+      report = 1;
+      token = Token({-1, -1, ";", 4, -1});
+      // token_index--;
+      // token = _tokens.erase(token);
+
+      // token = _tokens.insert(token, make_pair(4, ";"));
+    }
+  }
 }
 
 void SLR1Parser::PrintErrors() { reporter_->PrintLL1(); }
