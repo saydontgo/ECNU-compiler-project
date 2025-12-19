@@ -2,7 +2,7 @@
 #include "ll1_analyzer.h"
 #include "ll1_parser.h"
 #include "slr1_analyzer.h"
-#include <iomanip>
+#include "slr1_parser.h"
 /* 不要修改这个标准输入函数 */
 void read_prog(std::string &prog) {
   char c;

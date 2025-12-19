@@ -45,6 +45,7 @@ struct State {
 };
 
 class SLR1Analyzer {
+friend class SLR1Parser;
 public:
   SLR1Analyzer() = default;
   SLR1Analyzer(std::vector<std::string> &prods);
@@ -87,3 +88,6 @@ private:
   auto GetResult(int pos) -> std::string;
   auto HasState(std::set<Item> &target) -> int;
 };
+
+std::vector<std::string> Split(std::string s, std::string separator);
+std::string FirstWord(std::string s);

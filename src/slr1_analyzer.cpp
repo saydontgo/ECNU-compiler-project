@@ -1,6 +1,7 @@
 #include "slr1_analyzer.h"
 int Item::count_ = 0;
 
+// represent eplsion
 std::string EMPTYCH = "E";
 
 std::string FirstWord(std::string s) {
