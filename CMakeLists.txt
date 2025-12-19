@@ -16,6 +16,7 @@ set(SOURCES
     src/ll1_analyzer.cpp
     src/parse_tree.cpp
     src/ll1_parser.cpp
+    src/slr1_analyzer.cpp
     src/main.cpp
 )
 
