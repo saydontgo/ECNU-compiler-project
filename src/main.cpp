@@ -13,35 +13,36 @@ void read_prog(std::string &prog) {
   prog += '\n';
 }
 /* 你可以添加其他函数 */
-std::vector<std::string> prods = {"program->compoundstmt",
-                          "stmt->ifstmt|whilestmt|assgstmt|compoundstmt",
-                          "compoundstmt->{ stmts }",
-                          "stmts->stmt stmts|E",
-                          "ifstmt->if ( boolexpr ) then stmt else stmt",
-                          "whilestmt->while ( boolexpr ) stmt",
-                          "assgstmt->ID = arithexpr ;",
-                          "boolexpr->arithexpr boolop arithexpr",
-                          "boolop-><|>|<=|>=|==",
-                          "arithexpr->multexpr arithexprprime",
-                          "arithexprprime->+ multexpr arithexprprime|- multexpr arithexprprime|E",
-                          "multexpr->simpleexpr multexprprime",
-                          "multexprprime->* simpleexpr multexprprime|/ simpleexpr multexprprime|E",
-                          "simpleexpr->ID|NUM|( arithexpr )"};
+std::vector<std::string> prods = {
+    "program->compoundstmt",
+    "stmt->ifstmt|whilestmt|assgstmt|compoundstmt",
+    "compoundstmt->{ stmts }",
+    "stmts->stmt stmts|E",
+    "ifstmt->if ( boolexpr ) then stmt else stmt",
+    "whilestmt->while ( boolexpr ) stmt",
+    "assgstmt->ID = arithexpr ;",
+    "boolexpr->arithexpr boolop arithexpr",
+    "boolop-><|>|<=|>=|==",
+    "arithexpr->multexpr arithexprprime",
+    "arithexprprime->+ multexpr arithexprprime|- multexpr arithexprprime|E",
+    "multexpr->simpleexpr multexprprime",
+    "multexprprime->* simpleexpr multexprprime|/ simpleexpr multexprprime|E",
+    "simpleexpr->ID|NUM|( arithexpr )"};
 // 打印分析表
 void TableTest() {
-	std::map<std::pair<int, std::string>, std::string> action_table;
+  std::map<std::pair<int, std::string>, std::string> action_table;
   std::map<std::pair<int, std::string>, int> goto_table;
 
-	auto res = SLR1Analyzer(prods);
-	res.CreateSLRTable(action_table, goto_table);
+  auto res = SLR1Analyzer(prods);
+  res.CreateSLRTable(action_table, goto_table);
   std::cout << "LR分析表：" << std::endl;
 
-  auto x = res.GetTerminals(); // 含界符的终结符号集合
-	auto states = res.GetStates();
-	auto y = res.GetNonT();
+  auto x = res.GetTerminals();
+  auto states = res.GetStates();
+  auto y = res.GetNonT();
   x.push_back("#");
 
-  // 输出表格横轴
+  // TODO: change the style
   std::cout << "****************action****************" << std::endl;
   std::cout.setf(std::ios::left);
   for (auto it1 = x.begin(); it1 != x.end(); it1++) {
@@ -55,7 +56,6 @@ void TableTest() {
     std::cout << std::setw(10) << i;
 
     for (std::string t : x) {
-      // std::cout<<i<<"ttt"<<std::endl;
 
       if (!action_table.empty()) {
         std::pair<int, std::string> title(i, t);
@@ -69,8 +69,7 @@ void TableTest() {
   }
   std::cout << std::endl;
 
-  /*打印DFA_edges表*/
-  // std::vector<std::string> y = nonterminal_; // 不含S’的非终结符号集合
+  // print goto table
   y.erase(y.begin());
 
   std::cout << "****************goto******************" << std::endl;
@@ -80,7 +79,7 @@ void TableTest() {
     if (it1 == y.begin())
       std::cout << std::setw(10) << "";
 
-    std::cout << std::setw(8) << *it1;
+    std::cout << std::setw(15) << *it1;
   }
   std::cout << std::endl;
 
@@ -91,9 +90,9 @@ void TableTest() {
       std::pair<int, std::string> title(i, t);
 
       if (goto_table[title] != 0) {
-        std::cout << std::setw(8) << goto_table[title];
+        std::cout << std::setw(15) << goto_table[title];
       } else
-        std::cout << std::setw(8) << "";
+        std::cout << std::setw(15) << "";
     }
     std::cout << std::endl;
   }
@@ -167,6 +166,6 @@ int main(int argc, char *argv[]) {
   // Analysis(prog);
   // test_ll1Analyzer();
 
-	TableTest();
+  TableTest();
   return 0;
 }

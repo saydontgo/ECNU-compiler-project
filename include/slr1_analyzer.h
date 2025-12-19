@@ -52,11 +52,12 @@ public:
   void CreateSLRTable(
       std::map<std::pair<int, std::string>, std::string> &action_table,
       std::map<std::pair<int, std::string>, int> &goto_table);
-  
+
   // for debug propuses
   auto GetTerminals() -> std::vector<std::string> { return terminal_; }
   auto GetStates() -> std::set<State> { return states_; }
   auto GetNonT() -> std::vector<std::string> { return nonterminal_; }
+
 private:
   std::vector<std::string> terminal_;
   std::vector<std::string> nonterminal_;
@@ -77,12 +78,12 @@ private:
   void ComputeFollow();
   auto GetClosure(Item item) -> std::set<Item>;
   void BuildDFA();
-  auto Isnonterminal(std::string& token) -> bool;
-  auto InItemSet(Item& temp, std::set<Item>& c) -> bool;
+  auto Isnonterminal(std::string &token) -> bool;
+  auto InItemSet(Item &temp, std::set<Item> &c) -> bool;
   auto ShouldReduce(int num) -> std::string;
   auto FindReduce(int num) -> int;
-  auto FindReduce(Item& item) -> int;
+  auto FindReduce(Item &item) -> int;
   auto RightNum(std::string &left, int pos) -> int;
   auto GetResult(int pos) -> std::string;
-  auto HasState(std::set<Item>& target) -> int;
+  auto HasState(std::set<Item> &target) -> int;
 };
