@@ -10,7 +10,6 @@ auto SLR1Parser::ParsingTokens(std::shared_ptr<const TokenStream> tokens)
   std::stack<std::string> Analysis;
   std::stack<std::string> results;
 
-  // 0状态入栈
   Analysis.push("#");
   Analysis.push("0");
 
@@ -36,8 +35,8 @@ auto SLR1Parser::ParsingTokens(std::shared_ptr<const TokenStream> tokens)
     // reduce
     else if (res[0] == 'r') {
       int pos = stoi(res.substr(1));
-      std::string left;                      // 产生式左部
-      int b = 2 * ana_->RightNum(left, pos); // 2倍的产生式右部符号数量
+      std::string left;
+      int b = 2 * ana_->RightNum(left, pos);
       results.push(ana_->GetResult(pos));
       while (b > 0) {
         Analysis.pop();
@@ -56,7 +55,6 @@ auto SLR1Parser::ParsingTokens(std::shared_ptr<const TokenStream> tokens)
       }
       flag = 0;
       token = Token({-1, -1, EMPTYCH, token.line_, -1});
-      // token = _tokens.insert(token, E);
     } else {
       if (!report)
       reporter_->Report(ErrorLevel::Error,
@@ -65,10 +63,6 @@ auto SLR1Parser::ParsingTokens(std::shared_ptr<const TokenStream> tokens)
       flag = !flag;
       report = 1;
       token = Token({-1, -1, ";", 4, -1});
-      // token_index--;
-      // token = _tokens.erase(token);
-
-      // token = _tokens.insert(token, make_pair(4, ";"));
     }
   }
 }
@@ -77,15 +71,15 @@ void SLR1Parser::PrintErrors() { reporter_->PrintLL1(); }
 
 void SLR1Parser::PrintTables() {
   ana_->CreateSLRTable(action_table_, goto_table_);
-  std::cout << "LR分析表：" << std::endl;
+  std::cout << "SLR Table：" << std::endl;
 
   auto x = ana_->GetTerminals();
   auto states = ana_->GetStates();
   auto y = ana_->GetNonT();
   x.push_back("#");
 
-  // TODO: change the style
-  std::cout << "****************action****************" << std::endl;
+  // TODO: visualize the two table
+  std::cout << "action  table:" << std::endl;
   std::cout.setf(std::ios::left);
   for (auto it1 = x.begin(); it1 != x.end(); it1++) {
     if (it1 == x.begin())
@@ -114,7 +108,7 @@ void SLR1Parser::PrintTables() {
   // print goto table
   y.erase(y.begin());
 
-  std::cout << "****************goto******************" << std::endl;
+  std::cout << "goto table" << std::endl;
   std::cout.setf(std::ios::left);
 
   for (auto it1 = y.begin(); it1 != y.end(); it1++) {
