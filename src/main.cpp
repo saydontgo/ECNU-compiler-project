@@ -3,6 +3,7 @@
 #include "ll1_parser.h"
 #include "slr1_analyzer.h"
 #include "slr1_parser.h"
+#include "test.h"
 /* 不要修改这个标准输入函数 */
 void read_prog(std::string &prog) {
   char c;
@@ -121,46 +122,11 @@ void Analysis(std::string &prog) {
   /********* End *********/
 }
 
-void test_ll1Analyzer() {
-  std::string prog = "";
-  LexicalAnalyzer lexer(prog);
-  LL1Analyzer ana(lexer.GetTable());
-  auto res = ana.BuildTable();
-  LL1Parser parser(lexer.GetTable());
-
-  ana.PrintProds();
-  for (int i = static_cast<int>(NonTerminalType::threshold) + 1;
-       i < static_cast<int>(NonTerminalType::end); i++) {
-    auto nonterminal = parser.GetName(i);
-    std::cout << nonterminal << ": " << std::endl;
-    auto prods = res[static_cast<NonTerminalType>(i)];
-    for (const auto &prod : prods) {
-      std::cout << "\t" << parser.GetName(prod.first) << ": " << std::endl;
-      std::cout << "\t\t" << nonterminal << " -> ";
-      for (const auto &id : prod.second) {
-        std::string str = "eplison";
-        if (id != static_cast<int>(NonTerminalType::end)) {
-          str = parser.GetName(id);
-        }
-        std::cout << str << " ";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
-  }
-}
-
-int main(int argc, char *argv[]) {
-  std::string prog = "";
-  // read_prog(prog);
-
-  if (argc != 2) {
-    std::cout << "insufficent or reduntant parameters" << std::endl;
-    std::abort();
-  }
+void ReadFiles (const char* filename, std::string &prog) {
+  prog.clear();
   // using files to read
   std::ifstream ifs;
-  ifs.open(argv[1], std::ios::in);
+  ifs.open(filename, std::ios::in);
   if (!ifs.is_open()) {
     std::cout << "read fail." << std::endl;
     std::abort();
@@ -170,8 +136,52 @@ int main(int argc, char *argv[]) {
     prog += c;
   }
   prog += '\n';
+}
 
-  Analysis(prog);
+void Testinfo(std::string &&fname) {
+    std::cout << "loading test...\n" << \
+    "test name : " << fname << "\n" << \
+    "you can refer to test_data/" << fname << " to read the input\n";
+    std::cout << "result: \n";
+}
+
+int main(int argc, char *argv[]) {
+  std::string prog = "";
+  // read_prog(prog);
+
+  if (argc < 2 || argc > 3) {
+    std::cout << "insufficent or reduntant parameters" << std::endl;
+    std::abort();
+  }
+
+  switch(argv[1][0]) {
+    case '1':
+    Testinfo("project1/my_test3_所有错误形式.in");
+    ReadFiles("../test_data/project1/my_test3_所有错误形式.in", prog);
+    test_1(prog);
+    break;
+    case '2':
+    Testinfo("project1/my_test1_单引号与转义符.in");
+    ReadFiles("../test_data/project1/my_test1_单引号与转义符.in", prog);
+    test_2(prog);
+    break;
+    case '5':
+    test_5();
+    break;
+    case '7':
+    if (argc != 3) {
+      std::cout << "please specify a file to test" << std::endl;
+      std::abort();
+    }
+    ReadFiles(argv[2], prog);
+    Testinfo(argv[2]);
+    test_7(prog);
+    case '8':
+    case '9':
+    default:
+      std::cout << "test case does not match. Choose a number from (1, 2, 5, 7) to start testing.\n";
+  }
+  // Analysis(prog);
   // test_ll1Analyzer();
 
   // TableTest();

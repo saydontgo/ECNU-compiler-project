@@ -1,3 +1,4 @@
+#pragma once
 #include "error_reporter.h"
 #include "slr1_analyzer.h"
 #include "token.h"

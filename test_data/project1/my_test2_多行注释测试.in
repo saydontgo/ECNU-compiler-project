@@ -1,0 +1,13 @@
+/*
+ *  本测试用例测试了未结尾的多行注释能否报错
+ */
+
+int main()
+{char c = 'h';
+if (c=='h')printf("%c",c);
+else c='9';return 0;
+}/*gfh***** */
+
+
+/*  这是一条没有结尾的多行注释，
+即Unterminated comment block 错误
