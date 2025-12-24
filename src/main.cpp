@@ -176,8 +176,10 @@ int main(int argc, char *argv[]) {
     ReadFiles(argv[2], prog);
     Testinfo(argv[2]);
     test_7(prog);
-    case '8':
+    break;
     case '9':
+    test_9(prods);
+    break;
     default:
       std::cout << "test case does not match. Choose a number from (1, 2, 5, 7) to start testing.\n";
   }

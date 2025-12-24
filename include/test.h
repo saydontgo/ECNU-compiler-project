@@ -9,5 +9,4 @@ void test_1(std::string &prog);
 void test_2(std::string &prog);
 void test_5();
 void test_7(std::string &prog);
-void test_8();
-void test_9();
+void test_9(std::vector<std::string> &prods);
