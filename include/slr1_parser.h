@@ -2,10 +2,10 @@
 #include "error_reporter.h"
 #include "slr1_analyzer.h"
 #include "token.h"
+#include <iomanip>
 #include <map>
 #include <memory>
 #include <stack>
-#include <iomanip>
 
 extern std::string EMPTYCH;
 class SLR1Parser {

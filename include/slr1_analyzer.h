@@ -45,7 +45,8 @@ struct State {
 };
 
 class SLR1Analyzer {
-friend class SLR1Parser;
+  friend class SLR1Parser;
+
 public:
   SLR1Analyzer() = default;
   SLR1Analyzer(std::vector<std::string> &prods);

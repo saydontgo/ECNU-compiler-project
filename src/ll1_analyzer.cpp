@@ -180,13 +180,13 @@ void LL1Analyzer::BuildTableHelper(
   auto productions = production_[index];
   for (const auto &id : row.second) {
     for (const auto &prod : productions) {
-      if (prod[0] < static_cast<const int>(NonTerminalType::threshold) &&
+      if (prod[0] < static_cast<int>(NonTerminalType::threshold) &&
           prod[0] == id) {
         res.insert({id, prod});
         break;
-      } else if (prod[0] > static_cast<const int>(NonTerminalType::threshold)) {
+      } else if (prod[0] > static_cast<int>(NonTerminalType::threshold)) {
         // last production
-        if (prod[0] == static_cast<const int>(NonTerminalType::end)) {
+        if (prod[0] == static_cast<int>(NonTerminalType::end)) {
           res.insert({id, prod});
           break;
         }

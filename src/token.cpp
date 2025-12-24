@@ -15,13 +15,13 @@ void TokenStream::PrintAll() const {
 }
 
 void TokenStream::Print(int index) const {
-  assert(index > -1 && index < tokens_.size());
+  assert(index > -1 && size_t(index) < tokens_.size());
   std::cout << tokens_[index].pos_ << ": <" << tokens_[index].lexeme_ << ","
             << tokens_[index].id_ << ">\n";
 }
 
 auto TokenStream::TokenAt(int index) const -> const Token & {
-  assert(index > -1 && index < tokens_.size());
+  assert(index > -1 && size_t(index) < tokens_.size());
   return tokens_[index];
 }
 

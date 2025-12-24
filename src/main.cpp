@@ -122,7 +122,7 @@ void Analysis(std::string &prog) {
   /********* End *********/
 }
 
-void ReadFiles (const char* filename, std::string &prog) {
+void ReadFiles(const char *filename, std::string &prog) {
   prog.clear();
   // using files to read
   std::ifstream ifs;
@@ -139,10 +139,10 @@ void ReadFiles (const char* filename, std::string &prog) {
 }
 
 void Testinfo(std::string &&fname) {
-    std::cout << "loading test...\n" << \
-    "test name : " << fname << "\n" << \
-    "you can refer to test_data/" << fname << " to read the input\n";
-    std::cout << "result: \n";
+  std::cout << "loading test...\n"
+            << "test name : " << fname << "\n"
+            << "you can refer to test_data/" << fname << " to read the input\n";
+  std::cout << "result: \n";
 }
 
 int main(int argc, char *argv[]) {
@@ -154,21 +154,21 @@ int main(int argc, char *argv[]) {
     std::abort();
   }
 
-  switch(argv[1][0]) {
-    case '1':
+  switch (argv[1][0]) {
+  case '1':
     Testinfo("project1/my_test3_所有错误形式.in");
     ReadFiles("../test_data/project1/my_test3_所有错误形式.in", prog);
     test_1(prog);
     break;
-    case '2':
+  case '2':
     Testinfo("project1/my_test1_单引号与转义符.in");
     ReadFiles("../test_data/project1/my_test1_单引号与转义符.in", prog);
     test_2(prog);
     break;
-    case '5':
+  case '5':
     test_5();
     break;
-    case '7':
+  case '7':
     if (argc != 3) {
       std::cout << "please specify a file to test" << std::endl;
       std::abort();
@@ -177,11 +177,12 @@ int main(int argc, char *argv[]) {
     Testinfo(argv[2]);
     test_7(prog);
     break;
-    case '9':
+  case '9':
     test_9(prods);
     break;
-    default:
-      std::cout << "test case does not match. Choose a number from (1, 2, 5, 7) to start testing.\n";
+  default:
+    std::cout << "test case does not match. Choose a number from (1, 2, 5, 7) "
+                 "to start testing.\n";
   }
   // Analysis(prog);
   // test_ll1Analyzer();

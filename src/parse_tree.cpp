@@ -3,10 +3,12 @@
 #include "token.h"
 #include <memory>
 
-auto ParseTreeNode::invalid_table_ =
+std::shared_ptr<std::unordered_set<lex_id_t>> ParseTreeNode::invalid_table_ =
     std::make_shared<std::unordered_set<lex_id_t>>();
-auto ParseTreeNode::key_table_ = std::unordered_map<std::string, lex_id_t>();
-auto ParseTreeNode::rank_table_ = std::unordered_map<std::string, int>();
+std::unordered_map<std::string, lex_id_t> ParseTreeNode::key_table_ =
+    std::unordered_map<std::string, lex_id_t>();
+std::unordered_map<std::string, int> ParseTreeNode::rank_table_ =
+    std::unordered_map<std::string, int>();
 ParseTreeNode::ParseTreeNode(std::string name, lex_id_t id)
     : name_(name), id_(id) {}
 

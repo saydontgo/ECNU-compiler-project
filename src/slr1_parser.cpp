@@ -57,9 +57,8 @@ auto SLR1Parser::ParsingTokens(std::shared_ptr<const TokenStream> tokens)
       token = Token({-1, -1, EMPTYCH, token.line_, -1});
     } else {
       if (!report)
-      reporter_->Report(ErrorLevel::Error,
-                        ErrorCode::MissingSymbol, 4,
-                        token.col_, ";");
+        reporter_->Report(ErrorLevel::Error, ErrorCode::MissingSymbol, 4,
+                          token.col_, ";");
       flag = !flag;
       report = 1;
       token = Token({-1, -1, ";", 4, -1});

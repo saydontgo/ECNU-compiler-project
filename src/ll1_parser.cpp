@@ -86,7 +86,7 @@ auto LL1Parser::ParseTokens(std::shared_ptr<const TokenStream> tokens)
     -> std::shared_ptr<ParseTreeNode> {
   std::stack<int> parsing_stack;
   std::stack<std::shared_ptr<ParseTreeNode>> nodes;
-  size_t index = 0;
+  int index = 0;
   auto start_symbol = static_cast<int>(NonTerminalType::threshold) + 1;
   parsing_stack.push(start_symbol);
   root_ =
@@ -102,7 +102,7 @@ auto LL1Parser::ParseTokens(std::shared_ptr<const TokenStream> tokens)
     auto token = Token({-1, -1, " unknown sentence ",
                         tokens->TokenAt(tokens->Size() - 1).line_,
                         tokens->TokenAt(tokens->Size() - 1).col_ + 1});
-    if (index < tokens->Size()) {
+    if (size_t(index) < tokens->Size()) {
       token = tokens->TokenAt(index);
     }
     if (symbol < static_cast<int>(NonTerminalType::threshold)) {
@@ -158,7 +158,7 @@ auto LL1Parser::ParseTokens(std::shared_ptr<const TokenStream> tokens)
     }
   }
 
-  for (; index < tokens->Size(); index++) {
+  for (; size_t(index) < tokens->Size(); index++) {
     auto token = tokens->TokenAt(index);
     reporter_->Report(ErrorLevel::Error, ErrorCode::UnexpectedCharacterChinese,
                       token.line_, token.col_, token.lexeme_);
