@@ -2,7 +2,6 @@
 build/*
 .cache/*
 test
-test.cpp
 test_词法分析器*
 test_LL1文法解析器*
 test_SLR1文法解析器*
